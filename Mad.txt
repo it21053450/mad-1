@@ -1,0 +1,57 @@
+// button click
+btn.setOnClickListener(new View.OnClickListener(){
+	public void onClick(View view){
+
+	}
+});
+
+// Text get from edit text
+TextInputEditText text = findViewBy(R.id.textInput);
+String text = String.valueOf(text.getText());
+//convert it into integer if you want
+int number = Integer.parseInt(text);
+double doubmeNu = Double.parseDouble(text);
+`
+
+//fragmentations
+FragmentManager fragmentManage = getSupportFragmentManager();
+FragmentTransaction fragmentTransaction = fragmentManger.beginTransaction();
+fragmentTransaction.replace(R.id.framelayout,fragment);
+fragmenttransaction.commit();
+
+//services 
+background - runs only app is running
+foreground - stays alive even app is terminated
+      
+class MyService extends Service {
+	
+@override 
+public int onCommand(Intent intent,int flags,int startId){
+
+	//create notification
+	final String CHANNEL_ID = "Foreground Service ID";
+	NotificationChannel channel = new NotificationChanel(
+		CHANNEL_ID,
+		CHANNEL_ID,
+		NotificationManager.IMPORTANCE_LOW
+	);
+
+	getSystemService(NotificatonManager.class).createNotificationChanel(chanel);
+	Notification.Builder notification  = new Notification.Builder(this,CHANNEL_ID);
+	notification.setContentTrext("Service Yae");
+	
+	startForeground(1001,notification.build());
+	return super.onStartCommand(intent,flags,startId);
+}
+
+@Nullable 
+@override 
+public IBinder onBind(Intent intent){
+	return null;
+}
+	
+}
+
+/in mainactivity.xml
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+<service android:name=".MyService"></service>
