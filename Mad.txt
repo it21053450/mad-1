@@ -1,16 +1,16 @@
 // button click
-btn.setOnClickListener(new View.OnClickListener(){
+type_button_variable_name.setOnClickListener(new View.OnClickListener(){
 	public void onClick(View view){
 
 	}
 });
 
 // Text get from edit text
-TextInputEditText text = findViewBy(R.id.textInput);
+TextInputEditText text = findViewBy(R.id.type_edit_text_id_here);
 String text = String.valueOf(text.getText());
 //convert it into integer if you want
 int number = Integer.parseInt(text);
-double doubmeNu = Double.parseDouble(text);
+double doubMenu = Double.parseDouble(text);
 `
 
 //fragmentations
@@ -19,6 +19,7 @@ FragmentTransaction fragmentTransaction = fragmentManger.beginTransaction();
 fragmentTransaction.replace(R.id.framelayout,fragment);
 fragmenttransaction.commit();
 
+-------------------- stat service ----------------
 //services 
 background - runs only app is running
 foreground - stays alive even app is terminated
@@ -52,6 +53,349 @@ public IBinder onBind(Intent intent){
 	
 }
 
-/in mainactivity.xml
+//in mainactivity.xml
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 <service android:name=".MyService"></service>
+
+----- end of servce --------------
+
+------ get data from database and show it in a list or recycle view ------------
+
+//adapter class
+public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+
+    Context context;
+    ArrayList<DoctorModel> doctorsArrayList;
+    String date;
+    String time;
+
+    public MyAdapter(Context context, ArrayList<DoctorModel> doctorsArrayList, String date, String time) {
+        this.context = context;
+        this.doctorsArrayList = doctorsArrayList;
+        this.date = date;
+        this.time = time;
+    }
+
+    @NonNull
+    @Override
+    public MyAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+        View v = LayoutInflater.from(context).inflate(R.layout.item,parent,false);
+
+        return new MyViewHolder(v);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull MyAdapter.MyViewHolder holder, int position) {
+        DoctorModel doctorModel = doctorsArrayList.get(position);
+        holder.doctorsName.setText(doctorModel.name);
+        holder.doctorsEmail.setText(doctorModel.email);
+
+
+        holder.viewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context,DoctorProfile.class);
+                context.startActivity(intent);
+            }
+        });
+
+        holder.appointButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                AppointmentModel appointmentModel = new AppointmentModel(
+                        "",
+                        "currentUser",
+                        doctorModel.id,
+                        date,
+                        time,
+                        100,false
+                );
+                db.collection("appointments").document().set(appointmentModel)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    Toast.makeText(context, "Appointment Created Successfully", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(context,AllAppointmentsActivity.class);
+                                    context.startActivity(intent);
+                                }else{
+                                    Toast.makeText(context, "Create Appointment failed,Try again", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return doctorsArrayList.size();
+    }
+
+    public static class  MyViewHolder extends  RecyclerView.ViewHolder{
+
+        TextView doctorsName,doctorsEmail;
+        Button viewButton,appointButton;
+
+        public MyViewHolder(@NonNull View itemView) {
+            super(itemView);
+            doctorsName = itemView.findViewById(R.id.tvName);
+            doctorsEmail = itemView.findViewById(R.id.tvEmail);
+            viewButton = itemView.findViewById(R.id.viewDoctorButton);
+            appointButton = itemView.findViewById(R.id.createAppointmentButton);
+
+
+        }
+    }
+}
+
+//Mainactivity Java class
+RecyclerView recyclerView;
+ArrayList<DoctorModel> doctorsList;
+MyAdapter myAdapter;
+
+doctorsList = new ArrayList<DoctorModel>();
+
+myAdapter = new MyAdapter(DoctorsView.this,doctorsList,selectedDate,selectedTime);
+
+recyclerView = findViewById(R.id.recyclerView);
+recyclerView.setHasFixedSize(true);
+recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+recyclerView.setAdapter(myAdapter);
+
+------ end of get data from db ----------------------------------
+
+
+// toast message 
+Toast.makeText(this,"Type toast message here",Toast.LENGTH_SHORT).show();
+
+//alert dialog
+AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+alertDialog.setCancelable(true);
+alertDialog.setTitle("Type alert title here");
+alertDialog.setMessage("Type alert message here");
+alertDialog.show();
+
+// date picker
+final Calendar c = Calendar.getInstance();
+.
+int year = c.get(Calendar.YEAR);
+int month = c.get(Calendar.MONTH);
+int day = c.get(Calendar.DAY_OF_MONTH);
+
+DatePickerDialog datePickerDialog = new DatePickerDialog(
+	MainActivity.this,
+        new DatePickerDialog.OnDateSetListener() {
+                  @Override
+                  public void onDateSet(DatePicker view, int year,int monthOfYear, int dayOfMonth) {
+                              
+ 
+                     }
+                 },
+                 year, month, day
+);
+           
+datePickerDialog.show();
+
+--- end of datepicker ---
+
+---- timer picker ----
+//xml code
+<TimePicker
+   android:id="@+id/timePicker1"
+   android:layout_width="wrap_content"
+   android:layout_height="wrap_content" />
+
+//java code
+import android.widget.TimePicker;
+private TimePicker timePicker1;
+timePicker1 = (TimePicker) findViewById(R.id.timePicker1);	
+
+int hour = timePicker1.getCurrentHour();
+int min = timePicker1.getCurrentMinute();
+
+---- end of timer picker ----
+
+
+----  Linear layout ------
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="fill_parent"
+   android:layout_height="fill_parent"
+   android:orientation="vertical" />
+
+----- end of linear layout ----
+
+
+----  Constaint layout ------
+
+<androidx.constraintlayout.widget.ConstraintLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".type activty name here">
+
+----- end of Constaint layout ----
+
+
+----  Relative layout ------ 
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="fill_parent"
+   android:layout_height="fill_parent"
+   android:paddingLeft="16dp"
+   android:paddingRight="16dp" 
+	
+/>
+
+----- end of Relative layout ----
+
+
+--- add and get value to string.xml ----
+// set
+<string name="Edit_Vehicle">Edit</string>
+//
+
+------ end ----------
+
+--- get image from assets --------
+
+---- end -------------
+
+---- unit test case ---
+ //chanege the validator names according to q
+
+@Test
+public void emailValidator_CorrectEmailSimple_ReturnsTrue() {
+    assertTrue(EmailValidator.isValidEmail("name@email.com"));
+}
+
+2. Email with subdomain
+
+@Test
+public void emailValidator_CorrectEmailSubDomain_ReturnsTrue() {
+    assertTrue(EmailValidator.isValidEmail("name@email.co.uk"));
+}
+---- end ----
+
+
+--- checkbox --
+
+// xml
+
+  <CheckBox  
+        android:id="@+id/checkBox"  
+        android:layout_width="wrap_content"  
+        android:layout_height="wrap_content"  
+        android:layout_marginLeft="144dp"  
+        android:layout_marginTop="68dp"  
+        android:text="type_text_here"  
+        app:layout_constraintStart_toStartOf="parent"  
+        app:layout_constraintTop_toTopOf="parent" />  
+//java code
+  if(checkbox.isChecked()){  
+  }  
+--- end ---
+
+
+--- radio button --
+  <RadioGroup  
+        android:layout_width="wrap_content"  
+        android:layout_height="wrap_content"  
+        android:id="@+id/radioGroup">  
+  
+        <RadioButton  
+            android:id="@+id/radioMale"  
+            android:layout_width="fill_parent"  
+            android:layout_height="wrap_content"  
+            android:text="  Male"  
+            android:layout_marginTop="10dp"  
+            android:checked="false"  
+            android:textSize="20dp" />  
+  
+        <RadioButton  
+            android:id="@+id/radioFemale"  
+            android:layout_width="fill_parent"  
+            android:layout_height="wrap_content"  
+            android:text="   Female"  
+            android:layout_marginTop="20dp"  
+            android:checked="false"  
+  
+            android:textSize="20dp" />  
+    </RadioGroup> 
+
+//java code
+RadioButton genderradioButton;  
+RadioGroup radioGroup;
+
+radioGroup=(RadioGroup)findViewById(R.id.radioGroup);  
+
+ int selectedId = radioGroup.getCheckedRadioButtonId();  
+        genderradioButton = (RadioButton) findViewById(selectedId);  
+        if(selectedId==-1){  
+            Toast.makeText(MainActivity.this,"Nothing selected", Toast.LENGTH_SHORT).show();  
+        }  
+        else{  
+            Toast.makeText(MainActivity.this,genderradioButton.getText(), Toast.LENGTH_SHORT).show();  
+        }  
+
+--- end ---
+
+
+--- get image from gallery and set it in image view ---
+//xml code
+<ImageView
+        android:id="@+id/IVPreviewImage"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_below="@id/BSelectImage"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp" />
+
+
+//java code
+ImageView IVPreviewImage;
+int SELECT_PICTURE = 200;
+void imageChooser() {
+ 
+        // create an instance of the
+          // intent of the type image
+        Intent i = new Intent();
+        i.setType("image/*");
+        i.setAction(Intent.ACTION_GET_CONTENT);
+ 
+        // pass the constant to compare it
+          // with the returned requestCode
+        startActivityForResult(Intent.createChooser(i, "Select Picture"), SELECT_PICTURE);
+    }
+
+public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+ 
+        if (resultCode == RESULT_OK) {
+ 
+            // compare the resultCode with the
+              // SELECT_PICTURE constant
+            if (requestCode == SELECT_PICTURE) {
+                // Get the url of the image from data
+                Uri selectedImageUri = data.getData();
+                if (null != selectedImageUri) {
+                    // update the preview image in the layout
+                    IVPreviewImage.setImageURI(selectedImageUri);
+                }
+            }
+        }
+    }
+ 
+
+----- end get imagre from gallery *------
+
+
+
+
